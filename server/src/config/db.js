@@ -1,34 +1,20 @@
 const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
-
-let mongoMemoryServer = null;
+const dns = require('dns');
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 async function connectDB() {
   const uri = process.env.MONGODB_URI;
 
-  if (uri) {
-    try {
-      console.log(`[Database] Connecting to configured MongoDB at ${uri.replace(/\/\/.*@/, '//***@')}...`);
-      return await mongoose.connect(uri);
-    } catch (err) {
-      console.warn(`[Database] Connection to MONGODB_URI failed. Falling back to in-memory MongoDB...`, err.message);
-    }
+  if (!uri) {
+    throw new Error('MONGODB_URI is required. Set it to your MongoDB Atlas connection string in server/.env.');
   }
 
-  // Automatic in-memory MongoDB server for instant setup
-  console.log('[Database] Starting in-memory MongoDB server (zero external dependency mode)...');
-  mongoMemoryServer = await MongoMemoryServer.create();
-  const memUri = mongoMemoryServer.getUri();
-  console.log(`[Database] In-memory MongoDB running at: ${memUri}`);
-  
-  return await mongoose.connect(memUri);
+  console.log(`[Database] Connecting to configured MongoDB${process.env.NODE_ENV === 'test' ? ' (test run)' : ''}...`);
+  return mongoose.connect(uri);
 }
-
+ 
 async function disconnectDB() {
   await mongoose.disconnect();
-  if (mongoMemoryServer) {
-    await mongoMemoryServer.stop();
-  }
 }
 
 module.exports = { connectDB, disconnectDB };

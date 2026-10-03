@@ -70,7 +70,7 @@
 
 ### 1. Prerequisites
 - **Node.js** v18+ (tested on Node v20/v22)
-- **Zero Database Setup Required**: The backend automatically spins up an in-memory MongoDB instance (`mongodb-memory-server`) if no external `MONGODB_URI` is provided!
+- **MongoDB Atlas**: The backend and test suite both connect to the Atlas cluster configured by `MONGODB_URI`.
 
 ### 2. Installation
 Run the root installation command:
@@ -91,21 +91,21 @@ npm run dev
 *(Alternatively, run `npm run dev:server` in one terminal and `npm run dev:client` in another)*
 
 ### 4. Running Automated Tests
-Run the comprehensive test suite covering race conditions, OCC, idempotency, and workflow rules:
+Run the test suite covering race conditions, OCC, idempotency, and workflow rules. Tests use the same Atlas database configured for development and may change its data:
 ```bash
 npm run test
 ```
 
 ---
 
-## Environment Variables (Optional)
+## Environment Variables
 
 In `server/.env`:
 ```env
 PORT=5000
 NODE_ENV=development
-# Optional: Connect to external MongoDB (defaults to in-memory MongoDB if omitted)
-# MONGODB_URI=mongodb://localhost:27017/newtonite
+# Required: MongoDB Atlas connection string (Atlas > Connect > Drivers)
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/newtonite?retryWrites=true&w=majority
 
 # Optional: Enable live Gemini API triage (defaults to intelligent heuristics if omitted)
 # GEMINI_API_KEY=your_gemini_api_key_here
